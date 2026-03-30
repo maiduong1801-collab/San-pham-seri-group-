@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Seri Group — Content Structure Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #151821;
+    --surface2: #1c2030;
+    --border: rgba(255,255,255,0.07);
+    --accent: #f5a623;
+    --accent2: #e8437a;
+    --accent3: #4fc8e8;
+    --text: #e8eaf0;
+    --muted: #717a94;
+    --success: #3ecf8e;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0d0f14 0%, #1a1228 50%, #0d0f14 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -40px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 4px;
+  }
+  .logo-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+  }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .header p {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 900px;
+    margin: 32px auto;
+    padding: 0 24px;
+  }
+
+  /* FORM CARD */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 28px;
+  }
+  .form-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 7px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.3px;
+  }
+  input, select, textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 14px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border 0.2s;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: rgba(245,166,35,0.5);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  select option { background: #1c2030; }
+
+  /* CHANNEL CHIPS */
+  .chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 6px 14px;
+    transition: all 0.18s;
+    user-select: none;
+  }
+  .chip.active {
+    background: rgba(245,166,35,0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* GENERATE BUTTON */
+  .btn-generate {
+    background: linear-gradient(135deg, var(--accent), #e8962a);
+    border: none;
+    border-radius: 10px;
+    color: #0d0f14;
+    cursor: pointer;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 14.5px;
+    font-weight: 700;
+    padding: 13px 28px;
+    margin-top: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(245,166,35,0.25);
+  }
+  .btn-generate:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 28px rgba(245,166,35,0.38);
+  }
+  .btn-generate:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* SPINNER */
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(13,15,20,0.3);
+    border-top-color: #0d0f14;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* LOADING STATE */
+  .loading-state {
+    text-align: center;
+    padding: 48px 24px;
+  }
+  .loading-dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .loading-dots span {
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50% { transform: translateY(-8px); opacity: 1; }
+  }
+  .loading-state p { color: var(--muted); font-size: 14px; }
+
+  /* RESULTS */
+  .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .results-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .results-count {
+    background: rgba(245,166,35,0.12);
+    border: 1px solid rgba(245,166,35,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+  }
+  .btn-reset {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 6px 14px;
+    transition: all 0.18s;
+  }
+  .btn-reset:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+  /* CONTENT CARD */
+  .content-cards { display: flex; flex-direction: column; gap: 20px; }
+
+  .content-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .card-header:hover { background: rgba(255,255,255,0.02); }
+
+  .framework-badge {
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .card-header-info { flex: 1; }
+  .framework-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .framework-tagline {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .card-toggle {
+    color: var(--muted);
+    font-size: 18px;
+    transition: transform 0.2s;
+  }
+  .card-toggle.open { transform: rotate(180deg); }
+
+  .card-body {
+    padding: 20px 22px;
+    display: none;
+  }
+  .card-body.open { display: block; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  /* STRUCTURE STEPS */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .step-num {
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    height: 22px;
+    width: 22px;
+    min-width: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .step-content { font-size: 13.5px; color: var(--text); line-height: 1.55; }
+  .step-key { font-weight: 700; }
+
+  /* CONTENT EXAMPLE */
+  .example-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .example-box pre {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+  .copy-btn.copied { color: var(--success); border-color: rgba(62,207,142,0.4); }
+
+  /* WHEN TO USE */
+  .when-to-use {
+    background: rgba(79,200,232,0.06);
+    border: 1px solid rgba(79,200,232,0.15);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #87d8ed;
+    line-height: 1.55;
+  }
+  .when-to-use strong { color: var(--accent3); }
+
+  /* CHANNEL TAG */
+  .channel-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .channel-tag {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    color: var(--muted);
+  }
+
+  /* ERROR */
+  .error-box {
+    background: rgba(232,67,122,0.08);
+    border: 1px solid rgba(232,67,122,0.25);
+    border-radius: 10px;
+    padding: 18px 22px;
+    color: #f08aaa;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .header { padding: 20px; }
+    .main { padding: 0 14px; }
+    .form-card { padding: 20px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo-badge">SERI GROUP</div>
+    <h1>Content Structure Generator</h1>
+  </div>
+  <p>Nhập thông tin sản phẩm — AI tự động gợi ý đa dạng cấu trúc content phù hợp</p>
+</div>
+
+<div class="main">
+
+  <!-- FORM -->
+  <div class="form-card" id="formSection">
+    <div class="form-title">✦ Thông tin sản phẩm</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Tên sản phẩm *</label>
+        <input type="text" id="productName" placeholder="VD: Kem dưỡng ẩm Sulwhasoo" />
+      </div>
+      <div class="form-group">
+        <label>Xuất xứ *</label>
+        <select id="country">
+          <option value="">-- Chọn nước --</option>
+          <option value="Hàn Quốc">🇰🇷 Hàn Quốc</option>
+          <option value="Nhật Bản">🇯🇵 Nhật Bản</option>
+          <option value="Thái Lan">🇹🇭 Thái Lan</option>
+          <option value="Mỹ">🇺🇸 Mỹ</option>
+          <option value="Pháp">🇫🇷 Pháp</option>
+          <option value="Đài Loan">🇹🇼 Đài Loan</option>
+          <option value="Trung Quốc">🇨🇳 Trung Quốc</option>
+          <option value="Khác">🌏 Khác</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Danh mục sản phẩm *</label>
+        <select id="category">
+          <option value="">-- Chọn danh mục --</option>
+          <option>Skincare / Chăm sóc da</option>
+          <option>Makeup / Trang điểm</option>
+          <option>Thực phẩm / Đồ ăn</option>
+          <option>Thực phẩm chức năng</option>
+          <option>Gia dụng / Nhà cửa</option>
+          <option>Thời trang / Phụ kiện</option>
+          <option>Mẹ & Bé</option>
+          <option>Sức khoẻ / Dược phẩm</option>
+          <option>Khác</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Đối tượng khách hàng</label>
+        <input type="text" id="target" placeholder="VD: Nữ 22–35 tuổi, da hỗn hợp" />
+      </div>
+      <div class="form-group full">
+        <label>Điểm bán hàng nổi bật (USP)</label>
+        <textarea id="usp" placeholder="VD: Top 1 Olive Young 3 tháng liên tiếp, thành phần nhân sâm, không paraben, phù hợp da nhạy cảm..."></textarea>
+      </div>
+      <div class="form-group full">
+        <label>Kênh đăng content</label>
+        <div class="chip-group" id="channelChips">
+          <div class="chip active" data-val="Facebook">Facebook</div>
+          <div class="chip" data-val="Instagram">Instagram</div>
+          <div class="chip" data-val="TikTok">TikTok</div>
+          <div class="chip" data-val="Zalo">Zalo</div>
+          <div class="chip" data-val="Shopee/Lazada">Shopee/Lazada</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-generate" id="generateBtn" onclick="generate()">
+      <span>⚡</span> Tạo gợi ý cấu trúc content
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loadingState" style="display:none">
+    <div class="loading-state">
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+      <p id="loadingText">AI đang phân tích sản phẩm...</p>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="resultsSection" style="display:none">
+    <div class="results-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="results-title">Gợi ý cấu trúc content</div>
+        <div class="results-count" id="resultsCount"></div>
+      </div>
+      <button class="btn-reset" onclick="resetForm()">← Nhập lại</button>
+    </div>
+    <div class="content-cards" id="cardsContainer"></div>
+  </div>
+
+  <!-- ERROR -->
+  <div id="errorBox" class="error-box" style="display:none"></div>
+</div>
+
+<script>
+// Channel chips toggle
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => chip.classList.toggle('active'));
+});
+
+const COLORS = [
+  { bg: 'rgba(245,166,35,0.15)', color: '#f5a623', border: 'rgba(245,166,35,0.35)' },
+  { bg: 'rgba(232,67,122,0.15)', color: '#e8437a', border: 'rgba(232,67,122,0.35)' },
+  { bg: 'rgba(79,200,232,0.15)', color: '#4fc8e8', border: 'rgba(79,200,232,0.35)' },
+  { bg: 'rgba(62,207,142,0.15)', color: '#3ecf8e', border: 'rgba(62,207,142,0.35)' },
+  { bg: 'rgba(155,135,245,0.15)', color: '#9b87f5', border: 'rgba(155,135,245,0.35)' },
+  { bg: 'rgba(255,171,64,0.15)', color: '#ffab40', border: 'rgba(255,171,64,0.35)' },
+];
+
+const LOADING_MSGS = [
+  'AI đang phân tích sản phẩm...',
+  'Lựa chọn cấu trúc phù hợp...',
+  'Viết ví dụ content mẫu...',
+  'Hoàn thiện gợi ý...'
+];
+
+let loadingInterval;
+
+function startLoadingAnim() {
+  let i = 0;
+  document.getElementById('loadingText').textContent = LOADING_MSGS[0];
+  loadingInterval = setInterval(() => {
+    i = (i + 1) % LOADING_MSGS.length;
+    document.getElementById('loadingText').textContent = LOADING_MSGS[i];
+  }, 2200);
+}
+
+function stopLoadingAnim() {
+  clearInterval(loadingInterval);
+}
+
+function getSelectedChannels() {
+  return [...document.querySelectorAll('.chip.active')].map(c => c.dataset.val).join(', ') || 'Facebook';
+}
+
+async function generate() {
+  const productName = document.getElementById('productName').value.trim();
+  const country = document.getElementById('country').value;
+  const category = document.getElementById('category').value;
+  const target = document.getElementById('target').value.trim();
+  const usp = document.getElementById('usp').value.trim();
+  const channels = getSelectedChannels();
+
+  if (!productName || !country || !category) {
+    alert('Vui lòng điền đủ: Tên sản phẩm, Xuất xứ và Danh mục.');
+    return;
+  }
+
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('formSection').style.display = 'none';
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+  startLoadingAnim();
+
+  const prompt = `Bạn là chuyên gia content marketing cho thương hiệu Seri Group — chuyên bán hàng nội địa đa quốc gia theo mô hình B2C tại Việt Nam.
+
+Thông tin sản phẩm:
+- Tên: ${productName}
+- Xuất xứ: ${country}
+- Danh mục: ${category}
+- Đối tượng: ${target || 'chưa xác định cụ thể'}
+- Điểm nổi bật: ${usp || 'chưa cung cấp'}
+- Kênh đăng: ${channels}
+
+Nhiệm vụ: Gợi ý 5 cấu trúc content KHÁC NHAU (không bao gồm PASTA vì đã có sẵn) để tránh rập khuôn.
+
+Trả về JSON array với đúng định dạng sau, không kèm markdown hay backtick:
+[
+  {
+    "framework": "Tên viết tắt (VD: AIDA, BAB, 4U...)",
+    "name": "Tên đầy đủ tiếng Việt",
+    "tagline": "Một câu mô tả ngắn khi nào dùng cấu trúc này",
+    "steps": [
+      { "key": "Chữ viết tắt / tên bước", "desc": "Giải thích ngắn gọn bước này làm gì" }
+    ],
+    "example": "Bài content mẫu hoàn chỉnh áp dụng đúng cấu trúc này cho sản phẩm trên (viết tự nhiên như post thật, 80-150 chữ)",
+    "whenToUse": "Khi nào nên dùng cấu trúc này (tình huống cụ thể)",
+    "channels": ["Facebook", "Instagram"]
+  }
+]
+
+Chọn 5 framework đa dạng từ các cấu trúc như: AIDA, BAB (Before-After-Bridge), 4U, Storytelling, FAQ-Style, Social Proof First, Problem-Agitate-Solve khác PASTA, Listicle, Challenge/Controversy hook, Day-in-Life, hoặc bất kỳ framework phù hợp nào.
+Ví dụ content phải cụ thể, thực tế, đúng với sản phẩm và kênh. Viết tiếng Việt tự nhiên.`;
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const frameworks = JSON.parse(clean);
+
+    stopLoadingAnim();
+    document.getElementById('loadingState').style.display = 'none';
+    renderResults(frameworks, productName);
+
+  } catch (err) {
+    stopLoadingAnim();
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('formSection').style.display = 'block';
+    document.getElementById('generateBtn').disabled = false;
+    document.getElementById('errorBox').style.display = 'block';
+    document.getElementById('errorBox').innerHTML = '⚠️ Có lỗi xảy ra khi kết nối AI. Vui lòng thử lại.<br><small style="opacity:0.6">' + err.message + '</small>';
+  }
+}
+
+function renderResults(frameworks, productName) {
+  document.getElementById('resultsSection').style.display = 'block';
+  document.getElementById('resultsCount').textContent = frameworks.length + ' cấu trúc';
+
+  const container = document.getElementById('cardsContainer');
+  container.innerHTML = '';
+
+  frameworks.forEach((fw, i) => {
+    const color = COLORS[i % COLORS.length];
+    const delay = i * 80;
+
+    const card = document.createElement('div');
+    card.className = 'content-card';
+    card.style.animationDelay = delay + 'ms';
+
+    const stepsHTML = (fw.steps || []).map((s, si) => `
+      <div class="step">
+        <div class="step-num" style="background:${color.bg};color:${color.color};border:1px solid ${color.border}">${si + 1}</div>
+        <div class="step-content"><span class="step-key">${s.key}:</span> ${s.desc}</div>
+      </div>`).join('');
+
+    const channelTagsHTML = (fw.channels || []).map(c =>
+      `<div class="channel-tag">${c}</div>`).join('');
+
+    const cardId = 'card-body-' + i;
+
+    card.innerHTML = `
+      <div class="card-header" onclick="toggleCard('${cardId}', this)">
+        <div class="framework-badge" style="background:${color.bg};color:${color.color};border:1px solid ${color.border}">${fw.framework}</div>
+        <div class="card-header-info">
+          <div class="framework-name">${fw.name}</div>
+          <div class="framework-tagline">${fw.tagline}</div>
+        </div>
+        <div class="card-toggle ${i === 0 ? 'open' : ''}">▾</div>
+      </div>
+      <div class="card-body ${i === 0 ? 'open' : ''}" id="${cardId}">
+        <div class="section-label">Cấu trúc các bước</div>
+        <div class="steps">${stepsHTML}</div>
+
+        <div class="section-label">Ví dụ content mẫu — ${productName}</div>
+        <div class="example-box">
+          <pre id="ex-${i}">${fw.example}</pre>
+          <button class="copy-btn" onclick="copyText('ex-${i}', this)">Copy</button>
+        </div>
+
+        <div class="when-to-use">
+          <strong>📌 Dùng khi:</strong> ${fw.whenToUse}
+          <div class="channel-tags">${channelTagsHTML}</div>
+        </div>
+      </div>`;
+
+    container.appendChild(card);
+  });
+}
+
+function toggleCard(id, header) {
+  const body = document.getElementById(id);
+  const toggle = header.querySelector('.card-toggle');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  toggle.classList.toggle('open', !isOpen);
+}
+
+function copyText(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function resetForm() {
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('formSection').style.display = 'block';
+  document.getElementById('generateBtn').disabled = false;
+}
+</script>
+</body>
+</html>
