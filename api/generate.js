@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     console.log('API key prefix:', process.env.ANTHROPIC_API_KEY?.substring(0, 20));
 
     const payload = {
-      model: 'claude-3-haiku-20240307',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 2000,
       messages: messages
     };
